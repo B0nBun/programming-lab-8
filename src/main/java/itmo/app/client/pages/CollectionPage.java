@@ -2,12 +2,12 @@ package itmo.app.client.pages;
 
 import itmo.app.client.Client;
 import itmo.app.client.LocaleService;
+import itmo.app.client.components.TranslatedLabel;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class CollectionPage extends JPanel implements Page {
@@ -19,7 +19,7 @@ public class CollectionPage extends JPanel implements Page {
             var panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             {
-                var label = LocaleService.translated(new JLabel("test_string"));
+                var label = new TranslatedLabel("test_string");
                 panel.add(label);
             }
             {

@@ -4,12 +4,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 
 public class LocaleService {
 
@@ -72,35 +69,5 @@ public class LocaleService {
 
     public static String translate(String key) {
         return LocaleService.bundle.getString(key);
-    }
-
-    public static JLabel translated(JLabel label) {
-        String key = label.getText();
-        // Memory leak, which I won't fix, because Swing, like always, doesn't let me do it
-        label.setText(LocaleService.translate(key));
-        LocaleService.onLocaleChange((b, r) -> {
-            try {
-                label.setText(LocaleService.translate(key));
-            } catch (MissingResourceException err) {
-                err.printStackTrace();
-                label.setText(key);
-            }
-        });
-        return label;
-    }
-
-    public static JButton translated(JButton button) {
-        String key = button.getText();
-        // Memory leak, which I won't fix, because Swing, like always, doesn't let me do it
-        button.setText(LocaleService.translate(key));
-        LocaleService.onLocaleChange((b, r) -> {
-            try {
-                button.setText(LocaleService.translate(key));
-            } catch (MissingResourceException err) {
-                err.printStackTrace();
-                button.setText(key);
-            }
-        });
-        return button;
     }
 }

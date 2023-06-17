@@ -1,14 +1,11 @@
 package itmo.app.client;
 
-import itmo.app.client.components.LoginForm;
+import itmo.app.client.pages.LoginAndRegistrationPage;
+import itmo.app.client.pages.Page;
 import itmo.app.shared.clientrequest.ClientRequest;
-import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.RequestBody;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -16,7 +13,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
@@ -55,6 +51,7 @@ public class Client {
     }
 
     public static final JFrame frame = new JFrame();
+    public static Page currentPage = null;
 
     // TODO: Use EventQueue.invokeLater
     public static void main(String... args) {
@@ -71,29 +68,18 @@ public class Client {
 
         Client.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Client.frame.setSize(700, 500);
-        {
-            var gridWrapper = new JPanel(new GridBagLayout());
-            {
-                var formPanel = new LoginForm();
-                formPanel.onSubmit(event -> {
-                    if (event.login().length() == 0 || event.password().length() == 0) {
-                        Client.showNotification(
-                            "Login and password can't be empty",
-                            Color.pink
-                        );
-                        // TODO: Error notification
-                        return;
-                    }
-                    formPanel.setLoading(true);
-                    var t = new Timer(1000, _action -> formPanel.setLoading(false));
-                    t.setRepeats(false);
-                    t.start();
-                });
-                gridWrapper.add(formPanel);
-            }
-            Client.frame.add(gridWrapper);
-        }
+        Client.setPage(new LoginAndRegistrationPage());
         Client.frame.setVisible(true);
+    }
+
+    public static void setPage(Page page) {
+        if (Client.currentPage != null) {
+            Client.frame.remove(Client.currentPage.getComponent());
+        }
+        Client.currentPage = page;
+        Client.frame.add(page.getComponent());
+        Client.frame.revalidate();
+        Client.frame.repaint();
     }
 
     private static Point getPositionForPopup() {

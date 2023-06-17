@@ -1,9 +1,5 @@
 package itmo.app;
 
-import com.google.common.base.Function;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-
 /*
 Графический интерфейс клиентской части должен поддерживать русский, исландский, французкий и английский (Южная Африка) языки / локали. Должно обеспечиваться корректное отображение чисел, даты и времени в соответстии с локалью. Переключение языков должно происходить без перезапуска приложения. Локализованные ресурсы должны храниться в классе.
 
@@ -45,6 +41,7 @@ import javax.swing.JFrame;
 */
 
 public class App {
+
     public static void main(String[] args) {
         System.out.println("Hello, world");
     }

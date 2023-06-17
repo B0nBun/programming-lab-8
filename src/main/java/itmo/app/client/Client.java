@@ -1,5 +1,7 @@
 package itmo.app.client;
 
+import itmo.app.client.components.TranslatedMenu;
+import itmo.app.client.components.TranslatedRadioButtonMenuItem;
 import itmo.app.client.pages.LoginAndRegistrationPage;
 import itmo.app.client.pages.Page;
 import itmo.app.shared.clientrequest.ClientRequest;
@@ -18,7 +20,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.Timer;
@@ -56,10 +57,10 @@ public class Client {
     }
 
     private static JMenu createLanguageMenu() {
-        var menu = new JMenu("Language");
+        var menu = new TranslatedMenu("language");
         var languageButtonGroup = new ButtonGroup();
         for (var language : LocaleService.getLanguages()) {
-            var item = new JRadioButtonMenuItem(language.toString());
+            var item = new TranslatedRadioButtonMenuItem(language.key);
             item.addActionListener(_action -> {
                 LocaleService.changeLocale(language.locale);
             });

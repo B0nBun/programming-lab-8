@@ -11,15 +11,17 @@ import java.util.stream.Collectors;
 public class LocaleService {
 
     public static enum Language {
-        ENGLISH_SA(Locale.forLanguageTag("en-ZA")),
-        RUSSIAN(Locale.forLanguageTag("ru")),
-        ICELANDIC(Locale.forLanguageTag("is")),
-        FRENCH(Locale.forLanguageTag("fr"));
+        ENGLISH_SA(Locale.forLanguageTag("en-ZA"), "english.south_african"),
+        RUSSIAN(Locale.forLanguageTag("ru"), "russian"),
+        ICELANDIC(Locale.forLanguageTag("is"), "islandic"),
+        FRENCH(Locale.forLanguageTag("fr"), "french");
 
         public final Locale locale;
+        public final String key;
 
-        private Language(Locale locale) {
+        private Language(Locale locale, String key) {
             this.locale = locale;
+            this.key = key;
         }
 
         @Override
@@ -28,7 +30,7 @@ public class LocaleService {
         }
     }
 
-    private static Locale current = Locale.ENGLISH;
+    private static Locale current = Language.values()[0].locale;
     private static ResourceBundle bundle = ResourceBundle.getBundle(
         "Labels",
         LocaleService.current

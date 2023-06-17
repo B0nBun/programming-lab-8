@@ -16,16 +16,17 @@ public class LoginAndRegistrationPage extends JPanel implements Page {
         {
             var formPanel = new LoginForm();
             formPanel.onSubmit(event -> {
-                if (event.login().length() == 0 || event.password().length() == 0) {
-                    Client.showNotification(
-                        "Login and password can't be empty",
-                        Color.pink
-                    );
-                    return;
-                }
+                // TODO: Uncomment later
+                // if (event.login().length() == 0 || event.password().length() == 0) {
+                //     Client.showNotification(
+                //         "Login and password can't be empty",
+                //         Color.pink
+                //     );
+                //     return;
+                // }
                 formPanel.setLoading(true);
                 var t = new Timer(
-                    1000,
+                    200,
                     _action -> {
                         formPanel.setLoading(false);
                         Client.showNotification("Logged in!", Color.green);

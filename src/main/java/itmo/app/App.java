@@ -45,16 +45,7 @@ import javax.swing.JFrame;
 */
 
 public class App {
-
-    public static void call(Function<Integer, ?> f) {
-        f.apply(2);
-    }
-
     public static void main(String[] args) {
-        var frame = new JFrame();
-        frame.add(new JButton("sad"));
-        frame.setSize(400, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        System.out.println("Hello, world");
     }
 }

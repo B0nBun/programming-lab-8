@@ -23,6 +23,7 @@ public class LoginForm extends JPanel {
     private JButton submitButton = new JButton("Submit");
 
     public LoginForm() {
+        super();
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBorder(
                 BorderFactory.createCompoundBorder(

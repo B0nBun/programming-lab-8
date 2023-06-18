@@ -37,12 +37,21 @@ public class Messenger implements AutoCloseable {
         this.listeners.add(listener);
     }
 
-    public void sendAndThen(
-        ClientRequest request,
-        Consumer<ServerResponse<Serializable>> handler
+    public <T extends Serializable> void sendAndThen(
+        ClientRequest<T> request,
+        Consumer<ServerResponse<T>> handler
     ) throws IOException {
         Utils.writeObjectToCahnnel(channel, request);
-        this.responseHandlers.put(request.uuid, handler);
+        // Couldn't cast the consumer to Consumer<ServerResponse<Serializable>>, so
+        // decided to do it this ugly way
+        this.responseHandlers.put(
+                request.uuid,
+                response -> {
+                    @SuppressWarnings({ "unchecked" })
+                    var casted = (ServerResponse<T>) response;
+                    handler.accept(casted);
+                }
+            );
     }
 
     @Override

@@ -29,16 +29,17 @@ class ClientHandlingRunnable implements Runnable {
         this.client = client;
     }
 
-    private ServerResponse<? extends Serializable> handleRequest(ClientRequest request) {
-        var response = new ServerResponse<>(request.uuid, "Wow");
-        return response;
+    private <T extends Serializable> ServerResponse<T> handleRequest(
+        ClientRequest<T> request
+    ) {
+        return new ServerResponse<T>(request.uuid, request.body.getResponseBody());
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                var request = (ClientRequest) Utils.readObjectFromInputStream(
+                var request = (ClientRequest<?>) Utils.readObjectFromInputStream(
                     this.client.getInputStream()
                 );
                 var response = this.handleRequest(request);

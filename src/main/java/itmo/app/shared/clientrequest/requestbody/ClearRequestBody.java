@@ -1,3 +1,12 @@
 package itmo.app.shared.clientrequest.requestbody;
 
-public class ClearRequestBody implements RequestBody {}
+import java.io.Serializable;
+
+public class ClearRequestBody implements RequestBody<ClearRequestBody.ResponseBody> {
+
+    public static record ResponseBody(String errorMessage) implements Serializable {}
+
+    public ResponseBody getResponseBody() {
+        return new ResponseBody(null);
+    }
+}

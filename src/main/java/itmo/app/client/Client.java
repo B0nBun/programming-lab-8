@@ -5,7 +5,7 @@ import itmo.app.client.components.TranslatedRadioButtonMenuItem;
 import itmo.app.client.pages.LoginAndRegistrationPage;
 import itmo.app.client.pages.Page;
 import itmo.app.shared.clientrequest.ClientRequest;
-import itmo.app.shared.clientrequest.requestbody.RequestBody;
+import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import java.awt.Color;
 import java.awt.Point;
 import java.io.IOException;
@@ -131,7 +131,7 @@ public class Client {
                 Thread.sleep(1000);
             } catch (InterruptedException err) {}
             messenger.sendAndThen(
-                new ClientRequest("login", "password", new RequestBody() {}),
+                new ClientRequest<>("login", "password", new GetRequestBody()),
                 response -> {
                     System.out.println("Client got the response, handling...");
                     System.out.println("Handled response: " + response.body.toString());

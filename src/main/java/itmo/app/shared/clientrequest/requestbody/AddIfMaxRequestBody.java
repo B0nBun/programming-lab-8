@@ -1,3 +1,12 @@
 package itmo.app.shared.clientrequest.requestbody;
 
-public record AddIfMaxRequestBody(Void newElement) {}
+import java.io.Serializable;
+
+public record AddIfMaxRequestBody(Void newElement)
+    implements RequestBody<AddIfMaxRequestBody.ResponseBody> {
+    public static record ResponseBody(String errorMessage) implements Serializable {}
+
+    public ResponseBody getResponseBody() {
+        return new ResponseBody(null);
+    }
+}

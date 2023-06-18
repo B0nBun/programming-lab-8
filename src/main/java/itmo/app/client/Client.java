@@ -31,6 +31,17 @@ public class Client {
 
     public static final JFrame frame = new JFrame();
     public static Page currentPage = null;
+    public static Messenger messenger = null;
+
+    static {
+        try {
+            Client.messenger = new Messenger(new InetSocketAddress("127.0.0.1", 2000));
+        } catch (IOException err) {
+            // TODO: Handle
+            err.printStackTrace();
+            System.exit(1);
+        }
+    }
 
     // TODO: Use EventQueue.invokeLater
     public static void main(String... args) {

@@ -30,7 +30,9 @@ public class LoginAndRegistrationPage extends JPanel implements Page {
                     _action -> {
                         formPanel.setLoading(false);
                         Client.showNotification("Logged in!", Color.green);
-                        Client.setPage(new CollectionPage());
+                        Client.setPage(
+                            new CollectionPage(event.login(), event.password())
+                        );
                     }
                 );
                 t.setRepeats(false);

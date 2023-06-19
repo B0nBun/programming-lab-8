@@ -2,6 +2,7 @@ package itmo.app.client.pages;
 
 import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedLabel;
+import itmo.app.client.components.VehiclesTable;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import itmo.app.shared.entities.Vehicle;
@@ -13,8 +14,11 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class CollectionPage extends JPanel implements Page {
+
+    VehiclesTable table = new VehiclesTable(new ArrayList<>());
 
     public CollectionPage(String login, String password) {
         super();
@@ -37,6 +41,7 @@ public class CollectionPage extends JPanel implements Page {
                                 new GetRequestBody()
                             ),
                             response -> {
+                                this.table.updateRows(response.body);
                                 System.out.println(response.body);
                             }
                         );
@@ -45,6 +50,9 @@ public class CollectionPage extends JPanel implements Page {
                     }
                 });
                 panel.add(button);
+            }
+            {
+                panel.add(new JScrollPane(this.table));
             }
             this.add(panel);
         }

@@ -33,8 +33,9 @@ public class Messenger implements AutoCloseable {
         this.selectionThread.start();
     }
 
-    public void onCollectionUpdate(Consumer<ServerCollectionUpdate> listener) {
+    public Runnable onCollectionUpdate(Consumer<ServerCollectionUpdate> listener) {
         this.listeners.add(listener);
+        return () -> this.listeners.remove(listener);
     }
 
     public <T extends Serializable> void sendAndThen(

@@ -9,4 +9,8 @@ public class ClearRequestBody implements RequestBody<ClearRequestBody.ResponseBo
     public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
+
+    public boolean mutating() {
+        return true;
+    }
 }

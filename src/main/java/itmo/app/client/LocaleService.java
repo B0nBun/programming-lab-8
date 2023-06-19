@@ -59,8 +59,9 @@ public class LocaleService {
         LocaleService.notifyListeners(locale, LocaleService.bundle);
     }
 
-    public static void onLocaleChange(BiConsumer<Locale, ResourceBundle> listener) {
+    public static Runnable onLocaleChange(BiConsumer<Locale, ResourceBundle> listener) {
         LocaleService.listeners.add(listener);
+        return () -> LocaleService.listeners.remove(listener);
     }
 
     private static void notifyListeners(Locale locale, ResourceBundle rb) {

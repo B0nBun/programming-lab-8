@@ -13,4 +13,8 @@ public class GetRequestBody implements RequestBody<ArrayList<Vehicle>> {
             .stream()
             .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    public boolean mutating() {
+        return false;
+    }
 }

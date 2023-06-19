@@ -10,4 +10,8 @@ public record UpdateRequestBody(UUID vehicleUUID, Void updatedElement)
     public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
+
+    public boolean mutating() {
+        return true;
+    }
 }

@@ -4,4 +4,6 @@ import java.awt.Component;
 
 public interface Page {
     public Component getComponent();
+
+    public default void beforeRemoved() {}
 }

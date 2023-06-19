@@ -4,6 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import itmo.app.shared.Utils;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.RequestBody;
+import itmo.app.shared.servermessage.ServerCollectionUpdate;
 import itmo.app.shared.servermessage.ServerResponse;
 import java.io.EOFException;
 import java.io.IOException;
@@ -11,13 +12,17 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Server {
 
     public static final Logger logger = LoggerFactory.getLogger("itmo.app.server.logger");
+
+    private static final Collection<Socket> clients = new ConcurrentLinkedDeque<>();
 
     public static void main(String... args) throws IOException {
         Optional<String> psqlUrl = Server.loadDotenvDatabaseUrl();
@@ -43,10 +48,11 @@ public class Server {
         Server.logger.info("Server started");
         while (true) {
             Socket client = server.accept();
+            Server.clients.add(client);
             Server.logger.info(
                 "Client connected: " + client.getInetAddress() + ":" + client.getPort()
             );
-            new Thread(new ClientHandlingRunnable(client)).start();
+            new Thread(new ClientHandlingRunnable(client, Server.clients)).start();
         }
     }
 
@@ -65,20 +71,27 @@ public class Server {
 class ClientHandlingRunnable implements Runnable {
 
     final Socket client;
+    final Collection<Socket> clients;
 
-    public ClientHandlingRunnable(Socket client) {
+    public ClientHandlingRunnable(Socket client, Collection<Socket> clients) {
         this.client = client;
+        this.clients = clients;
     }
 
-    private <T extends Serializable> ServerResponse<T> handleRequest(
+    private static <T extends Serializable> ServerResponse<T> handleRequest(
         ClientRequest<T> request
     ) {
-        return new ServerResponse<T>(
+        var response = new ServerResponse<T>(
             request.uuid,
             request.body.getResponseBody(
                 new RequestBody.Context(request.login, request.password)
             )
         );
+        return response;
+    }
+
+    private static boolean shouldSendCollectionUpdate(ClientRequest<?> request) {
+        return request.body.mutating();
     }
 
     @Override
@@ -91,8 +104,20 @@ class ClientHandlingRunnable implements Runnable {
                 Server.logger.info(
                     "Got request from " + client.getInetAddress() + ":" + client.getPort()
                 );
-                var response = this.handleRequest(request);
+                var response = ClientHandlingRunnable.handleRequest(request);
                 Utils.writeObjectToOutputStream(response, this.client.getOutputStream());
+
+                if (ClientHandlingRunnable.shouldSendCollectionUpdate(request)) {
+                    var message = new ServerCollectionUpdate(
+                        DataSource.Vehicles.stream().toList()
+                    );
+                    for (Socket clientToNotify : this.clients) {
+                        Utils.writeObjectToOutputStream(
+                            message,
+                            clientToNotify.getOutputStream()
+                        );
+                    }
+                }
             } catch (EOFException err) {
                 Server.logger.info(
                     "Client disconnected: " +
@@ -100,6 +125,7 @@ class ClientHandlingRunnable implements Runnable {
                     ":" +
                     this.client.getPort()
                 );
+                this.clients.remove(client);
                 break;
             } catch (IOException | ClassNotFoundException err) {
                 Server.logger.error("Couldn't read the request: " + err.getMessage());

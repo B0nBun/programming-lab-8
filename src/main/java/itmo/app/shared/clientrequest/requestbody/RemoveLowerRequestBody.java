@@ -1,3 +1,16 @@
 package itmo.app.shared.clientrequest.requestbody;
 
-public record RemoveLowerRequestBody(Void checkingElement) {}
+import java.io.Serializable;
+
+public record RemoveLowerRequestBody(Void checkingElement)
+    implements RequestBody<Serializable> {
+    public static record ResponseBody(String errorMessage) implements Serializable {}
+
+    public ResponseBody getResponseBody(RequestBody.Context context) {
+        return new ResponseBody(null);
+    }
+
+    public boolean mutating() {
+        return true;
+    }
+}

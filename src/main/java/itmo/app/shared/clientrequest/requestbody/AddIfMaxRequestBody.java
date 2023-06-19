@@ -9,4 +9,8 @@ public record AddIfMaxRequestBody(Void newElement)
     public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
+
+    public boolean mutating() {
+        return true;
+    }
 }

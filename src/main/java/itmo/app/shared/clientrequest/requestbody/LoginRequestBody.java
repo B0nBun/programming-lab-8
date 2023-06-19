@@ -20,4 +20,8 @@ public class LoginRequestBody implements RequestBody<LoginRequestBody.Response> 
             return new Response(null, "SQL exception: " + err.getMessage());
         }
     }
+
+    public boolean mutating() {
+        return false;
+    }
 }

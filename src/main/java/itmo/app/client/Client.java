@@ -85,6 +85,7 @@ public class Client {
 
     public static void setPage(Page page) {
         if (Client.currentPage != null) {
+            Client.currentPage.beforeRemoved();
             Client.frame.remove(Client.currentPage.getComponent());
         }
         Client.currentPage = page;

@@ -61,7 +61,7 @@ public class Client {
         menuBar.add(menu);
 
         Client.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        Client.frame.setSize(700, 500);
+        Client.frame.setSize(1000, 800);
         Client.frame.setJMenuBar(menuBar);
         Client.setPage(new LoginAndRegistrationPage());
         Client.frame.setVisible(true);

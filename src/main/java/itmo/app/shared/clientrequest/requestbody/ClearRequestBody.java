@@ -6,7 +6,7 @@ public class ClearRequestBody implements RequestBody<ClearRequestBody.ResponseBo
 
     public static record ResponseBody(String errorMessage) implements Serializable {}
 
-    public ResponseBody getResponseBody() {
+    public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
 }

@@ -7,7 +7,7 @@ public record UpdateRequestBody(UUID vehicleUUID, Void updatedElement)
     implements RequestBody<UpdateRequestBody.ResponseBody> {
     public static record ResponseBody(String errorMessage) implements Serializable {}
 
-    public ResponseBody getResponseBody() {
+    public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
 }

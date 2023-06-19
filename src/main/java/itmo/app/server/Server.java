@@ -3,6 +3,7 @@ package itmo.app.server;
 import io.github.cdimascio.dotenv.Dotenv;
 import itmo.app.shared.Utils;
 import itmo.app.shared.clientrequest.ClientRequest;
+import itmo.app.shared.clientrequest.requestbody.RequestBody;
 import itmo.app.shared.servermessage.ServerResponse;
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,21 +19,8 @@ public class Server {
 
     public static final Logger logger = LoggerFactory.getLogger("itmo.app.server.logger");
 
-    private static Optional<Dotenv> dotenv;
-
-    static {
-        try {
-            Server.dotenv = Optional.of(Dotenv.load());
-            // There is a DotenvException thrown actually, but for some reason java doesn't see it
-            // so I had to use Throwable
-        } catch (Throwable err) {
-            Server.logger.error("Couldn't load dotenv file: {}", err.getMessage());
-            Server.dotenv = Optional.empty();
-        }
-    }
-
     public static void main(String... args) throws IOException {
-        Optional<String> psqlUrl = Server.dotenv.map(d -> d.get("VEHICLES_DATABASE_URL"));
+        Optional<String> psqlUrl = Server.loadDotenvDatabaseUrl();
         if (args.length >= 1) {
             psqlUrl = Optional.of(args[0]);
         }
@@ -52,9 +40,24 @@ public class Server {
 
         @SuppressWarnings({ "resource" })
         var server = new ServerSocket(2000);
+        Server.logger.info("Server started");
         while (true) {
             Socket client = server.accept();
+            Server.logger.info(
+                "Client connected: " + client.getInetAddress() + ":" + client.getPort()
+            );
             new Thread(new ClientHandlingRunnable(client)).start();
+        }
+    }
+
+    private static Optional<String> loadDotenvDatabaseUrl() {
+        try {
+            return Optional.of(Dotenv.load().get("VEHICLES_DATABASE_URL"));
+            // There is a DotenvException thrown actually, but for some reason java doesn't see it
+            // so I had to use Throwable
+        } catch (Throwable err) {
+            Server.logger.error("Couldn't load dotenv file: {}", err.getMessage());
+            return Optional.empty();
         }
     }
 }
@@ -70,7 +73,12 @@ class ClientHandlingRunnable implements Runnable {
     private <T extends Serializable> ServerResponse<T> handleRequest(
         ClientRequest<T> request
     ) {
-        return new ServerResponse<T>(request.uuid, request.body.getResponseBody());
+        return new ServerResponse<T>(
+            request.uuid,
+            request.body.getResponseBody(
+                new RequestBody.Context(request.login, request.password)
+            )
+        );
     }
 
     @Override
@@ -80,10 +88,13 @@ class ClientHandlingRunnable implements Runnable {
                 var request = (ClientRequest<?>) Utils.readObjectFromInputStream(
                     this.client.getInputStream()
                 );
+                Server.logger.info(
+                    "Got request from " + client.getInetAddress() + ":" + client.getPort()
+                );
                 var response = this.handleRequest(request);
                 Utils.writeObjectToOutputStream(response, this.client.getOutputStream());
             } catch (EOFException err) {
-                System.out.println(
+                Server.logger.info(
                     "Client disconnected: " +
                     this.client.getInetAddress() +
                     ":" +
@@ -91,7 +102,7 @@ class ClientHandlingRunnable implements Runnable {
                 );
                 break;
             } catch (IOException | ClassNotFoundException err) {
-                System.out.println("Couldn't read the request: " + err.getMessage());
+                Server.logger.error("Couldn't read the request: " + err.getMessage());
                 err.printStackTrace();
             }
         }

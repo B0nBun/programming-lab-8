@@ -6,7 +6,7 @@ public record AddRequestBody(Void newElement)
     implements RequestBody<AddRequestBody.ResponseBody> {
     public static record ResponseBody(String errorMessage) implements Serializable {}
 
-    public ResponseBody getResponseBody() {
+    public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
 }

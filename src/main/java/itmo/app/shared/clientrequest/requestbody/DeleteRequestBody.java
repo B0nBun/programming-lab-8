@@ -7,7 +7,7 @@ public record DeleteRequestBody(UUID vehicleUUID)
     implements RequestBody<DeleteRequestBody.ResponseBody> {
     public static record ResponseBody(String errorMessage) implements Serializable {}
 
-    public ResponseBody getResponseBody() {
+    public ResponseBody getResponseBody(RequestBody.Context context) {
         return new ResponseBody(null);
     }
 }

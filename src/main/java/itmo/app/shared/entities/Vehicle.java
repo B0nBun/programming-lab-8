@@ -13,7 +13,7 @@ public record Vehicle(
     VehicleType type,
     FuelType fuelType
 )
-    implements Comparable<Vehicle> {
+    implements Comparable<Vehicle>, Serializable {
     public int compareTo(Vehicle other) {
         return this.name().compareTo(other.name());
     }

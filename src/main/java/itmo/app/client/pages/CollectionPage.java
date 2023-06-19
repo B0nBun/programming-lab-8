@@ -4,6 +4,7 @@ import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedLabel;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
+import itmo.app.shared.entities.Vehicle;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -30,7 +31,7 @@ public class CollectionPage extends JPanel implements Page {
                 button.addActionListener(_action -> {
                     try {
                         Client.messenger.sendAndThen(
-                            new ClientRequest<ArrayList<Void>>(
+                            new ClientRequest<ArrayList<Vehicle>>(
                                 login,
                                 password,
                                 new GetRequestBody()

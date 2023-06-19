@@ -123,6 +123,14 @@ public class Client {
         Client.currentPopupTimer.start();
     }
 
+    public static void showErrorNotification(String message) {
+        Client.showNotification(message, Color.pink);
+    }
+
+    public static void showSuccessNotification(String message) {
+        Client.showNotification(message, Color.green);
+    }
+
     // TODO: Remove when won't be needed
     @SuppressWarnings("unused")
     private static void mesengerTest() throws IOException {

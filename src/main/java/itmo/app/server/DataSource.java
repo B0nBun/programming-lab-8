@@ -1,5 +1,6 @@
 package itmo.app.server;
 
+import itmo.app.shared.AuthResult;
 import itmo.app.shared.entities.Coordinates;
 import itmo.app.shared.entities.FuelType;
 import itmo.app.shared.entities.Vehicle;
@@ -236,18 +237,6 @@ public class DataSource {
                 ResultSet res = stat.executeQuery();
                 res.next();
                 return res.getBoolean("exists");
-            }
-        }
-
-        public static enum AuthResult {
-            LOGGEDIN,
-            REGISTERED,
-            REJECTED;
-
-            public boolean authorized() {
-                return (
-                    this.equals(AuthResult.LOGGEDIN) || this.equals(AuthResult.REGISTERED)
-                );
             }
         }
 

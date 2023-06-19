@@ -54,6 +54,18 @@ public class Messenger implements AutoCloseable {
             );
     }
 
+    public <T extends Serializable> void sendAndThen(
+        ClientRequest<T> request,
+        Consumer<ServerResponse<T>> handler,
+        Consumer<IOException> errorHandler
+    ) {
+        try {
+            this.sendAndThen(request, handler);
+        } catch (IOException err) {
+            errorHandler.accept(err);
+        }
+    }
+
     @Override
     public void close() throws Exception {
         this.channel.close();

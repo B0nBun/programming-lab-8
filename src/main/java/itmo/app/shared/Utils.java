@@ -13,8 +13,53 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+
+import itmo.app.shared.exceptions.ValidationException;
+
 public class Utils {
 
+    @FunctionalInterface
+    public static interface Validator<T> {
+        /**
+         * Function, which validates that the value of type {@code T} is correct
+         *
+         * @param value Value to validate
+         * @return The same value if it is valid, otherwise throws
+         * @throws ValidationException Thrown if the validation failed
+         */
+        T validate(T value) throws ValidationException;
+
+        public static <T> Validator<T> from(
+            Predicate<T> predicate,
+            Function<T, String> messageGetter
+        ) {
+            return value -> {
+                boolean valid = predicate.test(value);
+                if (valid) return value;
+                throw new ValidationException(messageGetter.apply(value));
+            };
+        }
+
+        public static <T> Validator<T> from(Predicate<T> predicate, String failMessage) {
+            return Validator.from(predicate, __ -> failMessage);
+        }
+    }
+
+    @FunctionalInterface
+    public static interface NumberParser<N> {
+        /**
+         * Method, which parses some kind of the number value from provided String. (It actually can be
+         * any type, but {@link NumberFormatException} is what signifies the failed parsing)
+         *
+         * @param string A string from which the value should be parsed
+         * @return A parsed value
+         * @throws NumberFormatException This exception is thrown if the parsing is failed
+         */
+        N parse(String string) throws NumberFormatException;
+    }
+    
     public static Object readObjectFromChannel(SocketChannel channel)
         throws IOException, ClassNotFoundException {
         var objectSizeBuffer = ByteBuffer.allocate(Integer.BYTES);

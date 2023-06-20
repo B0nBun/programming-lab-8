@@ -4,6 +4,7 @@ import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
 import itmo.app.client.components.VehiclesTable;
 import itmo.app.shared.clientrequest.ClientRequest;
+import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -150,7 +151,16 @@ public class CollectionPage extends JPanel implements Page {
             {
                 var clearButton = new TranslatedButton("clear");
                 clearButton.addActionListener(_action -> {
-                    System.out.println("clear");
+                    Client.messenger.sendAndThen(
+                        new ClientRequest<>(login, password, new ClearRequestBody()),
+                        response -> {
+                            String error = response.body.errorMessage();
+                            if (error != null) Client.showErrorNotification(error);
+                        },
+                        error -> {
+                            Client.showErrorNotification("error: " + error.getMessage());
+                        }
+                    );
                 });
                 this.add(clearButton, new ButtonConstraints());
             }

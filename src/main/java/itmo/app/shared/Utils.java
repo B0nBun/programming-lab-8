@@ -1,5 +1,8 @@
 package itmo.app.shared;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import itmo.app.shared.exceptions.ValidationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,11 +15,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-
-import itmo.app.shared.exceptions.ValidationException;
 
 public class Utils {
 
@@ -59,7 +57,7 @@ public class Utils {
          */
         N parse(String string) throws NumberFormatException;
     }
-    
+
     public static Object readObjectFromChannel(SocketChannel channel)
         throws IOException, ClassNotFoundException {
         var objectSizeBuffer = ByteBuffer.allocate(Integer.BYTES);

@@ -31,7 +31,7 @@ public class FieldSchemaNum<N extends Comparable<N>>
             N parsed = parser.parse(input);
             return parsed;
         } catch (NumberFormatException err) {
-            throw new ParsingException(err.getMessage());
+            throw new ParsingException("expected a number");
         }
     }
 

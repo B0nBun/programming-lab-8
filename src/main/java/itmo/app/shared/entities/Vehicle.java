@@ -1,5 +1,9 @@
 package itmo.app.shared.entities;
 
+import itmo.app.shared.fieldschema.FieldSchema;
+import itmo.app.shared.fieldschema.FieldSchemaEnum;
+import itmo.app.shared.fieldschema.FieldSchemaNum;
+import itmo.app.shared.fieldschema.FieldSchemaString;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -48,4 +52,25 @@ public record Vehicle(
         FuelType fuelType
     )
         implements Serializable {}
+
+    public static final class fields {
+
+        public static final FieldSchemaString name = FieldSchema
+            .str()
+            .nonnull()
+            .nonempty();
+
+        public static final FieldSchemaNum<Integer> enginePower = FieldSchema
+            .integer()
+            .nonnull()
+            .greaterThan(0);
+
+        public static final FieldSchemaEnum<FuelType> fuelType = FieldSchema.enumeration(
+            FuelType.class
+        );
+
+        public static final FieldSchemaEnum<VehicleType> vehicleType = FieldSchema.enumeration(
+            VehicleType.class
+        );
+    }
 }

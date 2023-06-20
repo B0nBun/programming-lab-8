@@ -1,10 +1,12 @@
 package itmo.app.client.pages.collectionpage.components;
 
+import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedLabel;
 import itmo.app.shared.entities.Coordinates;
 import itmo.app.shared.entities.FuelType;
 import itmo.app.shared.entities.Vehicle;
 import itmo.app.shared.entities.VehicleType;
+import itmo.app.shared.exceptions.ParsingException;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,22 +64,38 @@ public class AddPanel extends JPanel {
 
         var button = new JButton("add");
         button.addActionListener(_action -> {
-            String name = this.nameField.getText();
-            Coordinates coordinates = new Coordinates(
-                Integer.parseInt(this.coordinatesXField.getText()),
-                Float.parseFloat(this.coordinatesYField.getText())
-            );
-            Integer enginePower = Integer.parseInt(this.enginePowerField.getText());
-            VehicleType type = (VehicleType) this.vehicleTypeCombo.getSelectedItem();
-            FuelType fuelType = (FuelType) this.fuelTypeCombo.getSelectedItem();
-            var vehicleSchema = new Vehicle.CreationSchema(
-                name,
-                coordinates,
-                enginePower,
-                type,
-                fuelType
-            );
-            listener.accept(vehicleSchema);
+            try {
+                String name = Vehicle.fields.name.fromString(
+                    this.nameField.getText(),
+                    "name"
+                );
+                Coordinates coordinates = new Coordinates(
+                    Coordinates.fields.x.fromString(
+                        this.coordinatesXField.getText(),
+                        "coordinates.x"
+                    ),
+                    Coordinates.fields.y.fromString(
+                        this.coordinatesYField.getText(),
+                        "coordinates.y"
+                    )
+                );
+                Integer enginePower = Vehicle.fields.enginePower.fromString(
+                    this.enginePowerField.getText(),
+                    "engine_power"
+                );
+                VehicleType type = (VehicleType) this.vehicleTypeCombo.getSelectedItem();
+                FuelType fuelType = (FuelType) this.fuelTypeCombo.getSelectedItem();
+                var vehicleSchema = new Vehicle.CreationSchema(
+                    name,
+                    coordinates,
+                    enginePower,
+                    type,
+                    fuelType
+                );
+                listener.accept(vehicleSchema);
+            } catch (ParsingException err) {
+                Client.showErrorNotification(err.getMessage());
+            }
         });
         this.add(button, new InnerConstraints());
     }

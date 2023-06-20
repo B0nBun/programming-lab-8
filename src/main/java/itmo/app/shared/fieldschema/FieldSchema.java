@@ -23,13 +23,13 @@ public interface FieldSchema<T, Self extends FieldSchema<T, Self>> extends Valid
         }
     }
 
-    public default T fromString(String input)
-        throws ValidationException, ParsingException {
+    // TODO: error translation
+    public default T fromString(String input, String fieldname) throws ParsingException {
         try {
             T parsed = this.parse(input);
             return this.validate(parsed);
-        } catch (NumberFormatException err) {
-            throw new ParsingException(err.getMessage());
+        } catch (ValidationException | ParsingException err) {
+            throw new ParsingException(fieldname + ": " + err.getMessage());
         }
     }
 

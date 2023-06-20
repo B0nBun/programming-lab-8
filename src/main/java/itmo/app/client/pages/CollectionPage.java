@@ -4,7 +4,6 @@ import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
 import itmo.app.client.components.VehiclesTable;
 import itmo.app.shared.clientrequest.ClientRequest;
-import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -12,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
 
 public class CollectionPage extends JPanel implements Page {
 
@@ -40,63 +40,8 @@ public class CollectionPage extends JPanel implements Page {
             this.add(scrollPane, scrollPane.constraints);
         }
         {
-            var sidePanel = new JPanel(new GridBagLayout());
-            // sidePanel.setPreferredSize(new Dimension(100, -1));
-            {
-                var updateButton = new TranslatedButton("send update request");
-                updateButton.addActionListener(_action -> {
-                    Client.messenger.sendAndThen(
-                        new ClientRequest<>(login, password, new ClearRequestBody()),
-                        response -> {},
-                        error -> {
-                            Client.showErrorNotification("error: " + error.getMessage());
-                        }
-                    );
-                });
-                var buttonConstraints = new GridBagConstraints();
-                buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
-                buttonConstraints.anchor = GridBagConstraints.PAGE_START;
-                buttonConstraints.weightx = 0;
-                buttonConstraints.weighty = 0;
-                buttonConstraints.gridx = 0;
-                buttonConstraints.gridy = 0;
-                buttonConstraints.gridheight = 1;
-                buttonConstraints.gridwidth = 1;
-                sidePanel.add(updateButton, buttonConstraints);
-            }
-            {
-                var updateButton = new TranslatedButton("send update request");
-                updateButton.addActionListener(_action -> {
-                    Client.messenger.sendAndThen(
-                        new ClientRequest<>(login, password, new ClearRequestBody()),
-                        response -> {},
-                        error -> {
-                            Client.showErrorNotification("error: " + error.getMessage());
-                        }
-                    );
-                });
-                var buttonConstraints = new GridBagConstraints();
-                buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
-                buttonConstraints.anchor = GridBagConstraints.PAGE_START;
-                buttonConstraints.weightx = 0;
-                buttonConstraints.weighty = 0;
-                buttonConstraints.gridx = 0;
-                buttonConstraints.gridy = 1;
-                buttonConstraints.gridheight = 1;
-                buttonConstraints.gridwidth = 1;
-                sidePanel.add(updateButton, buttonConstraints);
-            }
-
-            var sidePanelConstraints = new GridBagConstraints();
-            sidePanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-            sidePanelConstraints.anchor = GridBagConstraints.PAGE_START;
-            sidePanelConstraints.weightx = 0;
-            sidePanelConstraints.weighty = 0;
-            sidePanelConstraints.gridx = 1;
-            sidePanelConstraints.gridy = 0;
-            sidePanelConstraints.gridheight = 1;
-            sidePanelConstraints.gridwidth = 1;
-            this.add(sidePanel, sidePanelConstraints);
+            var sidepanel = new SidePanel(login, password);
+            this.add(sidepanel, sidepanel.constraints);
         }
     }
 
@@ -106,6 +51,15 @@ public class CollectionPage extends JPanel implements Page {
 
         public VehiclesScrollPane(VehiclesTable table) {
             super(table);
+            table.setModel(
+                new DefaultTableModel() {
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+                    }
+                }
+            );
+
             this.constraints.fill = GridBagConstraints.BOTH;
             this.constraints.weightx = 1;
             this.constraints.weighty = 1;
@@ -113,6 +67,93 @@ public class CollectionPage extends JPanel implements Page {
             this.constraints.gridy = 0;
             this.constraints.gridheight = 1;
             this.constraints.gridwidth = 1;
+        }
+    }
+
+    private static class SidePanel extends JPanel {
+
+        private class ButtonConstraints extends GridBagConstraints {
+
+            private static int counter = 0;
+
+            public ButtonConstraints() {
+                super();
+                this.fill = GridBagConstraints.HORIZONTAL;
+                this.anchor = GridBagConstraints.PAGE_START;
+                this.weightx = 0;
+                this.weighty = 0;
+                this.gridx = 0;
+                this.gridy = counter;
+                counter++;
+                this.gridheight = 1;
+                this.gridwidth = 1;
+            }
+        }
+
+        public final GridBagConstraints constraints = new GridBagConstraints();
+
+        public SidePanel(String login, String password) {
+            super();
+            this.constraints.fill = GridBagConstraints.HORIZONTAL;
+            this.constraints.anchor = GridBagConstraints.PAGE_START;
+            this.constraints.weightx = 0;
+            this.constraints.weighty = 0;
+            this.constraints.gridx = 1;
+            this.constraints.gridy = 0;
+            this.constraints.gridheight = 1;
+            this.constraints.gridwidth = 1;
+            this.setLayout(new GridBagLayout());
+            /**
+             * add
+             * add-if-max
+             * update
+             * remove
+             * remove-lower
+             * clear
+             * ? group-counting-by-id
+             */
+            {
+                var addButton = new TranslatedButton("add");
+                addButton.addActionListener(_action -> {
+                    System.out.println("add button");
+                });
+                this.add(addButton, new ButtonConstraints());
+            }
+            {
+                var addIfMaxButton = new TranslatedButton("add_if_max");
+                addIfMaxButton.addActionListener(_action -> {
+                    System.out.println("add-if-max");
+                });
+                this.add(addIfMaxButton, new ButtonConstraints());
+            }
+            {
+                var updateButton = new TranslatedButton("update");
+                updateButton.addActionListener(_action -> {
+                    System.out.println("update");
+                });
+                this.add(updateButton, new ButtonConstraints());
+            }
+            {
+                var removeButton = new TranslatedButton("remove");
+                removeButton.addActionListener(_action -> {
+                    System.out.println("remove");
+                });
+                this.add(removeButton, new ButtonConstraints());
+            }
+            {
+                var removeLowerButton = new TranslatedButton("remove-lower");
+                removeLowerButton.addActionListener(_action -> {
+                    System.out.println("remove-lower");
+                });
+                this.add(removeLowerButton, new ButtonConstraints());
+            }
+            {
+                var clearButton = new TranslatedButton("clear");
+                clearButton.addActionListener(_action -> {
+                    System.out.println("clear");
+                });
+                this.add(clearButton, new ButtonConstraints());
+            }
         }
     }
 

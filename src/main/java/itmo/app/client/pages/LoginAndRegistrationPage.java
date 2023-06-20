@@ -3,6 +3,7 @@ package itmo.app.client.pages;
 import itmo.app.client.Client;
 import itmo.app.client.components.LoginForm;
 import itmo.app.client.components.LoginForm.LoginEvent;
+import itmo.app.client.pages.collectionpage.CollectionPage;
 import itmo.app.shared.AuthResult;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.LoginRequestBody;

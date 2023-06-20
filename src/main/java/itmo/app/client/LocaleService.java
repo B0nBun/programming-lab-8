@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -71,6 +72,10 @@ public class LocaleService {
     }
 
     public static String translate(String key) {
-        return LocaleService.bundle.getString(key);
+        try {
+            return LocaleService.bundle.getString(key);
+        } catch (MissingResourceException err) {
+            return key;
+        }
     }
 }

@@ -57,6 +57,7 @@ public class DataSource {
 
         public static int add(String login, Vehicle.CreationSchema schema)
             throws SQLException {
+            System.out.println(schema.toString());
             try (
                 var stat = DataSource.database.prepareStatement(
                     """

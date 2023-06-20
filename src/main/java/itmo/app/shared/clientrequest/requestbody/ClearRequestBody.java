@@ -3,7 +3,6 @@ package itmo.app.shared.clientrequest.requestbody;
 import itmo.app.server.DataSource;
 import java.io.Serializable;
 import java.sql.SQLException;
-import javax.xml.crypto.Data;
 
 public class ClearRequestBody implements RequestBody<ClearRequestBody.ResponseBody> {
 

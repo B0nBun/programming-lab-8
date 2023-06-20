@@ -1,13 +1,21 @@
 package itmo.app.shared.clientrequest.requestbody;
 
+import itmo.app.server.DataSource;
+import itmo.app.shared.entities.Vehicle;
 import java.io.Serializable;
+import java.sql.SQLException;
 
-public record AddRequestBody(Void newElement)
+public record AddRequestBody(Vehicle.CreationSchema schema)
     implements RequestBody<AddRequestBody.ResponseBody> {
     public static record ResponseBody(String errorMessage) implements Serializable {}
 
     public ResponseBody getResponseBody(RequestBody.Context context) {
-        return new ResponseBody(null);
+        try {
+            DataSource.Vehicles.add(context.login(), this.schema());
+            return new ResponseBody(null);
+        } catch (SQLException err) {
+            return new ResponseBody(err.getMessage());
+        }
     }
 
     public boolean mutating() {

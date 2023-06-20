@@ -1,15 +1,21 @@
-package itmo.app.client.pages;
+package itmo.app.client.pages.collectionpage;
 
 import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
 import itmo.app.client.components.VehiclesTable;
+import itmo.app.client.pages.Page;
+import itmo.app.client.pages.collectionpage.components.AddPanel;
 import itmo.app.shared.clientrequest.ClientRequest;
+import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
+import itmo.app.shared.entities.Vehicle;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.function.Consumer;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
@@ -116,7 +122,36 @@ public class CollectionPage extends JPanel implements Page {
             {
                 var addButton = new TranslatedButton("add");
                 addButton.addActionListener(_action -> {
-                    System.out.println("add button");
+                    var dialog = new JDialog(Client.frame, "Title", true);
+                    Consumer<Vehicle.CreationSchema> listener = creationSchema -> {
+                        Client.messenger.sendAndThen(
+                            new ClientRequest<>(
+                                login,
+                                password,
+                                new AddRequestBody(creationSchema)
+                            ),
+                            response -> {
+                                if (response.body.errorMessage() != null) {
+                                    Client.showErrorNotification(
+                                        "error: " + response.body.errorMessage()
+                                    );
+                                } else {
+                                    Client.showSuccessNotification("success");
+                                    dialog.dispose();
+                                }
+                            },
+                            error -> {
+                                Client.showErrorNotification(
+                                    "error: " + error.getMessage()
+                                );
+                            }
+                        );
+                    };
+                    dialog
+                        .getContentPane()
+                        .add(new AddPanel(dialog, login, password, listener));
+                    dialog.pack();
+                    dialog.setVisible(true);
                 });
                 this.add(addButton, new ButtonConstraints());
             }

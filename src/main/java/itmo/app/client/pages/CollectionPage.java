@@ -6,9 +6,7 @@ import itmo.app.client.components.VehiclesTable;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -24,35 +22,6 @@ public class CollectionPage extends JPanel implements Page {
     public CollectionPage(String login, String password) {
         super();
         this.setLayout(new GridBagLayout());
-        this.setBackground(Color.pink);
-
-        {
-            var headerPanel = new JPanel(new GridBagLayout());
-            headerPanel.setPreferredSize(new Dimension(-1, 100));
-            {
-                var updateButton = new TranslatedButton("send update request");
-                updateButton.addActionListener(_action -> {
-                    Client.messenger.sendAndThen(
-                        new ClientRequest<>(login, password, new ClearRequestBody()),
-                        response -> {},
-                        error -> {
-                            Client.showErrorNotification("error: " + error.getMessage());
-                        }
-                    );
-                });
-                headerPanel.add(updateButton);
-            }
-            var headerConstraints = new GridBagConstraints();
-            headerConstraints.fill = GridBagConstraints.HORIZONTAL;
-            headerConstraints.anchor = GridBagConstraints.PAGE_START;
-            headerConstraints.weightx = 1;
-            headerConstraints.weighty = 0;
-            headerConstraints.gridx = 0;
-            headerConstraints.gridy = 0;
-            headerConstraints.gridheight = 1;
-            headerConstraints.gridwidth = 1;
-            this.add(headerPanel, headerConstraints);
-        }
         {
             var scrollPane = new CollectionPage.VehiclesScrollPane(this.table);
             Client.messenger.sendAndThen(
@@ -66,10 +35,68 @@ public class CollectionPage extends JPanel implements Page {
             );
             this.unsubscribeFromCollectionUpdate =
                 Client.messenger.onCollectionUpdate(message -> {
-                    System.out.println("Update");
                     this.table.updateRows(message.newCollection);
                 });
             this.add(scrollPane, scrollPane.constraints);
+        }
+        {
+            var sidePanel = new JPanel(new GridBagLayout());
+            // sidePanel.setPreferredSize(new Dimension(100, -1));
+            {
+                var updateButton = new TranslatedButton("send update request");
+                updateButton.addActionListener(_action -> {
+                    Client.messenger.sendAndThen(
+                        new ClientRequest<>(login, password, new ClearRequestBody()),
+                        response -> {},
+                        error -> {
+                            Client.showErrorNotification("error: " + error.getMessage());
+                        }
+                    );
+                });
+                var buttonConstraints = new GridBagConstraints();
+                buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
+                buttonConstraints.anchor = GridBagConstraints.PAGE_START;
+                buttonConstraints.weightx = 0;
+                buttonConstraints.weighty = 0;
+                buttonConstraints.gridx = 0;
+                buttonConstraints.gridy = 0;
+                buttonConstraints.gridheight = 1;
+                buttonConstraints.gridwidth = 1;
+                sidePanel.add(updateButton, buttonConstraints);
+            }
+            {
+                var updateButton = new TranslatedButton("send update request");
+                updateButton.addActionListener(_action -> {
+                    Client.messenger.sendAndThen(
+                        new ClientRequest<>(login, password, new ClearRequestBody()),
+                        response -> {},
+                        error -> {
+                            Client.showErrorNotification("error: " + error.getMessage());
+                        }
+                    );
+                });
+                var buttonConstraints = new GridBagConstraints();
+                buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
+                buttonConstraints.anchor = GridBagConstraints.PAGE_START;
+                buttonConstraints.weightx = 0;
+                buttonConstraints.weighty = 0;
+                buttonConstraints.gridx = 0;
+                buttonConstraints.gridy = 1;
+                buttonConstraints.gridheight = 1;
+                buttonConstraints.gridwidth = 1;
+                sidePanel.add(updateButton, buttonConstraints);
+            }
+
+            var sidePanelConstraints = new GridBagConstraints();
+            sidePanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+            sidePanelConstraints.anchor = GridBagConstraints.PAGE_START;
+            sidePanelConstraints.weightx = 0;
+            sidePanelConstraints.weighty = 0;
+            sidePanelConstraints.gridx = 1;
+            sidePanelConstraints.gridy = 0;
+            sidePanelConstraints.gridheight = 1;
+            sidePanelConstraints.gridwidth = 1;
+            this.add(sidePanel, sidePanelConstraints);
         }
     }
 
@@ -83,7 +110,7 @@ public class CollectionPage extends JPanel implements Page {
             this.constraints.weightx = 1;
             this.constraints.weighty = 1;
             this.constraints.gridx = 0;
-            this.constraints.gridy = 2;
+            this.constraints.gridy = 0;
             this.constraints.gridheight = 1;
             this.constraints.gridwidth = 1;
         }

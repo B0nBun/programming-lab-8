@@ -1,11 +1,10 @@
 package itmo.app.shared.clientrequest.requestbody;
 
+import itmo.app.server.DataSource;
+import itmo.app.shared.entities.Vehicle;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Optional;
-
-import itmo.app.server.DataSource;
-import itmo.app.shared.entities.Vehicle;
 
 public record AddIfMaxRequestBody(Vehicle.CreationSchema newElement)
     implements RequestBody<AddIfMaxRequestBody.ResponseBody> {
@@ -18,10 +17,7 @@ public record AddIfMaxRequestBody(Vehicle.CreationSchema newElement)
                 .map(m -> m.compareToCreationSchema(newElement) < 0)
                 .orElse(true);
             if (shouldAdd) {
-                DataSource.Vehicles.add(
-                    context.login(),
-                    newElement
-                );
+                DataSource.Vehicles.add(context.login(), newElement);
                 return new ResponseBody(null);
             } else {
                 return new ResponseBody("element is not max");

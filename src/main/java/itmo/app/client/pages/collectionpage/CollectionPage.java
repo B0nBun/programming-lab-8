@@ -10,6 +10,7 @@ import itmo.app.shared.clientrequest.requestbody.AddIfMaxRequestBody;
 import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
+import itmo.app.shared.clientrequest.requestbody.RemoveRequestBody;
 import itmo.app.shared.clientrequest.requestbody.UpdateRequestBody;
 import itmo.app.shared.entities.Vehicle;
 import java.awt.Component;
@@ -302,9 +303,46 @@ public class CollectionPage extends JPanel implements Page {
             }
             {
                 var removeButton = new TranslatedButton("remove");
+                removeButton.setEnabled(false);
                 removeButton.addActionListener(_action -> {
-                    System.out.println("remove");
+                    var dialog = new JDialog(Client.frame, "Update", true);
+                    Vehicle selectedVehicle = Vehicle.fromTable(
+                        table,
+                        table.getSelectedRow()
+                    );
+                    int id = selectedVehicle.id();
+                    Client.messenger.sendAndThen(
+                        new ClientRequest<>(login, password, new RemoveRequestBody(id)),
+                        response -> {
+                            if (response.body.errorMessage() != null) {
+                                Client.showErrorNotification(
+                                    "error: " + response.body.errorMessage()
+                                );
+                            } else {
+                                Client.showSuccessNotification("success");
+                                dialog.dispose();
+                            }
+                        },
+                        error -> {
+                            Client.showErrorNotification("error: " + error.getMessage());
+                        }
+                    );
                 });
+                table
+                    .getSelectionModel()
+                    .addListSelectionListener(selectionEvent -> {
+                        int row = table.getSelectedRow();
+                        if (row == -1) {
+                            removeButton.setEnabled(false);
+                        } else {
+                            Vehicle selected = Vehicle.fromTable(table, row);
+                            if (selected.createdBy().equals(login)) {
+                                removeButton.setEnabled(true);
+                            } else {
+                                removeButton.setEnabled(false);
+                            }
+                        }
+                    });
                 this.add(removeButton, new ButtonConstraints());
             }
             {

@@ -1,6 +1,7 @@
 package itmo.app.client.components;
 
 import itmo.app.shared.entities.Vehicle;
+import java.awt.EventQueue;
 import java.util.Collection;
 import java.util.stream.Stream;
 import javax.swing.JTable;
@@ -22,7 +23,9 @@ public class VehiclesTable extends JTable {
 
     public VehiclesTable(Collection<Vehicle> vehicles) {
         super();
-        this.updateRows(vehicles);
+        EventQueue.invokeLater(() -> {
+            this.updateRows(vehicles);
+        });
     }
 
     public void updateRows(Collection<Vehicle> vehicles) {
@@ -30,9 +33,11 @@ public class VehiclesTable extends JTable {
     }
 
     public void updateRows(String[][] tabledata) {
-        var model = (DefaultTableModel) this.getModel();
-        model.setRowCount(tabledata.length);
-        model.setDataVector(tabledata, columnNames);
+        EventQueue.invokeLater(() -> {
+            var model = (DefaultTableModel) this.getModel();
+            model.setRowCount(tabledata.length);
+            model.setDataVector(tabledata, columnNames);
+        });
     }
 
     private static String[][] tableDataFromVehicleCollection(

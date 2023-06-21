@@ -7,6 +7,7 @@ import itmo.app.client.pages.Page;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Point;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -84,14 +85,16 @@ public class Client {
     }
 
     public static void setPage(Page page) {
-        if (Client.currentPage != null) {
-            Client.currentPage.beforeRemoved();
-            Client.frame.remove(Client.currentPage.getComponent());
-        }
-        Client.currentPage = page;
-        Client.frame.add(page.getComponent());
-        Client.frame.revalidate();
-        Client.frame.repaint();
+        EventQueue.invokeLater(() -> {
+            if (Client.currentPage != null) {
+                Client.currentPage.beforeRemoved();
+                Client.frame.remove(Client.currentPage.getComponent());
+            }
+            Client.currentPage = page;
+            Client.frame.add(page.getComponent());
+            Client.frame.revalidate();
+            Client.frame.repaint();
+        });
     }
 
     private static Point getPositionForPopup() {

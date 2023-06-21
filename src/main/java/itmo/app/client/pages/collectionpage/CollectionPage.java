@@ -10,6 +10,7 @@ import itmo.app.shared.clientrequest.requestbody.AddIfMaxRequestBody;
 import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
+import itmo.app.shared.clientrequest.requestbody.RemoveLowerRequestBody;
 import itmo.app.shared.clientrequest.requestbody.RemoveRequestBody;
 import itmo.app.shared.clientrequest.requestbody.UpdateRequestBody;
 import itmo.app.shared.entities.Vehicle;
@@ -348,7 +349,44 @@ public class CollectionPage extends JPanel implements Page {
             {
                 var removeLowerButton = new TranslatedButton("remove-lower");
                 removeLowerButton.addActionListener(_action -> {
-                    System.out.println("remove-lower");
+                    var dialog = new JDialog(Client.frame, "Add", true);
+                    Consumer<Vehicle.CreationSchema> listener = creationSchema -> {
+                        Client.messenger.sendAndThen(
+                            new ClientRequest<>(
+                                login,
+                                password,
+                                new RemoveLowerRequestBody(creationSchema)
+                            ),
+                            response -> {
+                                if (response.body.errorMessage() != null) {
+                                    Client.showErrorNotification(
+                                        "error: " + response.body.errorMessage()
+                                    );
+                                } else {
+                                    Client.showSuccessNotification("success");
+                                    dialog.dispose();
+                                }
+                            },
+                            error -> {
+                                Client.showErrorNotification(
+                                    "error: " + error.getMessage()
+                                );
+                            }
+                        );
+                    };
+                    dialog
+                        .getContentPane()
+                        .add(
+                            new CreationSchemaPanel(
+                                dialog,
+                                login,
+                                password,
+                                listener,
+                                Optional.empty()
+                            )
+                        );
+                    dialog.pack();
+                    dialog.setVisible(true);
                 });
                 this.add(removeLowerButton, new ButtonConstraints());
             }

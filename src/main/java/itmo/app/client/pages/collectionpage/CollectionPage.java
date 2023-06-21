@@ -2,6 +2,7 @@ package itmo.app.client.pages.collectionpage;
 
 import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
+import itmo.app.client.components.TranslatedLabel;
 import itmo.app.client.components.VehiclesTable;
 import itmo.app.client.pages.Page;
 import itmo.app.client.pages.collectionpage.components.CreationSchemaPanel;
@@ -13,8 +14,11 @@ import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
 import itmo.app.shared.clientrequest.requestbody.RemoveLowerRequestBody;
 import itmo.app.shared.clientrequest.requestbody.RemoveRequestBody;
 import itmo.app.shared.clientrequest.requestbody.UpdateRequestBody;
+import itmo.app.shared.entities.FuelType;
 import itmo.app.shared.entities.Vehicle;
+import itmo.app.shared.entities.VehicleType;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
@@ -22,10 +26,14 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class CollectionPage extends JPanel implements Page {
 
@@ -41,7 +49,8 @@ public class CollectionPage extends JPanel implements Page {
             Client.messenger.sendAndThen(
                 new ClientRequest<>(login, password, new GetRequestBody()),
                 response -> {
-                    this.table.updateRows(response.body);
+                    this.table.updateVehicles(response.body);
+                    // this.table.updateRows(response.body);
                 },
                 error -> {
                     Client.showErrorNotification("error: " + error.getMessage());
@@ -49,7 +58,7 @@ public class CollectionPage extends JPanel implements Page {
             );
             this.unsubscribeFromCollectionUpdate =
                 Client.messenger.onCollectionUpdate(message -> {
-                    this.table.updateRows(message.newCollection);
+                    this.table.updateVehicles(message.newCollection);
                 });
             this.add(scrollPane, scrollPane.constraints);
         }
@@ -94,11 +103,11 @@ public class CollectionPage extends JPanel implements Page {
 
     private static class SidePanel extends JPanel {
 
-        private class ButtonConstraints extends GridBagConstraints {
+        private class InnerConstraints extends GridBagConstraints {
 
             private static int counter = 0;
 
-            public ButtonConstraints() {
+            public InnerConstraints() {
                 super();
                 this.fill = GridBagConstraints.HORIZONTAL;
                 this.anchor = GridBagConstraints.PAGE_START;
@@ -125,12 +134,7 @@ public class CollectionPage extends JPanel implements Page {
             this.constraints.gridheight = 1;
             this.constraints.gridwidth = 1;
             this.setLayout(new GridBagLayout());
-            /**
-             * Commands:
-             * remove
-             * remove-lower
-             * ? group-counting-by-id
-             */
+            // TODO?: group-counting-by-id
             {
                 // TODO: Translate dialog title
                 var addButton = new TranslatedButton("add");
@@ -174,7 +178,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog.pack();
                     dialog.setVisible(true);
                 });
-                this.add(addButton, new ButtonConstraints());
+                this.add(addButton, new InnerConstraints());
             }
             {
                 var addIfMaxButton = new TranslatedButton("add_if_max");
@@ -218,7 +222,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog.pack();
                     dialog.setVisible(true);
                 });
-                this.add(addIfMaxButton, new ButtonConstraints());
+                this.add(addIfMaxButton, new InnerConstraints());
             }
             {
                 var updateButton = new TranslatedButton("update");
@@ -290,7 +294,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog.pack();
                     dialog.setVisible(true);
                 });
-                this.add(updateButton, new ButtonConstraints());
+                this.add(updateButton, new InnerConstraints());
             }
             {
                 var removeButton = new TranslatedButton("remove");
@@ -334,7 +338,7 @@ public class CollectionPage extends JPanel implements Page {
                             }
                         }
                     });
-                this.add(removeButton, new ButtonConstraints());
+                this.add(removeButton, new InnerConstraints());
             }
             {
                 var removeLowerButton = new TranslatedButton("remove-lower");
@@ -378,7 +382,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog.pack();
                     dialog.setVisible(true);
                 });
-                this.add(removeLowerButton, new ButtonConstraints());
+                this.add(removeLowerButton, new InnerConstraints());
             }
             {
                 var clearButton = new TranslatedButton("clear");
@@ -394,8 +398,48 @@ public class CollectionPage extends JPanel implements Page {
                         }
                     );
                 });
-                this.add(clearButton, new ButtonConstraints());
+                this.add(clearButton, new InnerConstraints());
             }
+            {
+                var space = Box.createRigidArea(new Dimension(0, 20));
+                this.add(space, new InnerConstraints());
+            }
+            {
+                var label = new TranslatedLabel("filters");
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                this.add(label, new InnerConstraints());
+            }
+            var smallerFont = this.getFont().deriveFont(this.getFont().getSize() * 0.9f);
+
+            Function<String, TranslatedLabel> createLabel = key -> {
+                var label = new TranslatedLabel(key);
+                label.setFont(smallerFont);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                return label;
+            };
+
+            this.add(createLabel.apply("id"), new InnerConstraints());
+            var idFilter = new JTextField();
+            this.add(createLabel.apply("name"), new InnerConstraints());
+            var nameFilter = new JTextField();
+            this.add(createLabel.apply("created_by"), new InnerConstraints());
+            var createdByFilter = new JTextField();
+            this.add(createLabel.apply("coordinates.x"), new InnerConstraints());
+            var coordsXFilter = new JTextField();
+            this.add(createLabel.apply("coordinates.y"), new InnerConstraints());
+            var coordsYFilter = new JTextField();
+            this.add(createLabel.apply("creation_date"), new InnerConstraints());
+            var creationDateFilter = new JTextField();
+            this.add(createLabel.apply("engine_power"), new InnerConstraints());
+            var enginePowerFilter = new JTextField();
+            this.add(createLabel.apply("vehicle_type"), new InnerConstraints());
+            var vehicleTypeFilter = new FuelType.Combo();
+            this.add(createLabel.apply("fuel_type"), new InnerConstraints());
+            var fuelTypeFilter = new VehicleType.Combo();
+
+            var filterButton = new TranslatedButton("apply_filters");
+            filterButton.addActionListener(_action -> {});
+            this.add(filterButton, new InnerConstraints());
         }
     }
 

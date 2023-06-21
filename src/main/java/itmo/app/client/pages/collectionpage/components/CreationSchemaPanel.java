@@ -61,12 +61,12 @@ public class CreationSchemaPanel extends JPanel {
         this.add(enginePowerField, new InnerConstraints());
         this.add(Box.createRigidArea(new Dimension(0, 10)), new InnerConstraints());
 
-        JComboBox<VehicleType> vehicleTypeCombo = new VehicleType.Combo();
+        JComboBox<VehicleType> vehicleTypeCombo = new VehicleType.Combo(false);
         this.add(new TranslatedLabel("vehicle_type"), new InnerConstraints());
         this.add(vehicleTypeCombo, new InnerConstraints());
         this.add(Box.createRigidArea(new Dimension(0, 10)), new InnerConstraints());
 
-        JComboBox<FuelType> fuelTypeCombo = new FuelType.Combo();
+        JComboBox<FuelType> fuelTypeCombo = new FuelType.Combo(false);
         this.add(new TranslatedLabel("fuel_type"), new InnerConstraints());
         this.add(fuelTypeCombo, new InnerConstraints());
         this.add(Box.createRigidArea(new Dimension(0, 10)), new InnerConstraints());

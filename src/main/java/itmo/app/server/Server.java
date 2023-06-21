@@ -6,7 +6,6 @@ import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.RequestBody;
 import itmo.app.shared.servermessage.ServerCollectionUpdate;
 import itmo.app.shared.servermessage.ServerResponse;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
@@ -101,6 +100,16 @@ class ClientHandlingRunnable implements Runnable {
                 var request = (ClientRequest<?>) Utils.readObjectFromInputStream(
                     this.client.getInputStream()
                 );
+                if (request == null) {
+                    Server.logger.info(
+                        "Client disconnected: " +
+                        this.client.getInetAddress() +
+                        ":" +
+                        this.client.getPort()
+                    );
+                    this.clients.remove(client);
+                    break;
+                }
                 Server.logger.info(
                     "Got request from " + client.getInetAddress() + ":" + client.getPort()
                 );
@@ -118,15 +127,6 @@ class ClientHandlingRunnable implements Runnable {
                         );
                     }
                 }
-            } catch (EOFException err) {
-                Server.logger.info(
-                    "Client disconnected: " +
-                    this.client.getInetAddress() +
-                    ":" +
-                    this.client.getPort()
-                );
-                this.clients.remove(client);
-                break;
             } catch (IOException | ClassNotFoundException err) {
                 Server.logger.error("Couldn't read the request: " + err.getMessage());
                 err.printStackTrace();

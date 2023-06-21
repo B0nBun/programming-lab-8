@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import itmo.app.shared.exceptions.ValidationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -120,11 +121,14 @@ public class Utils {
         int size = ByteBuffer.wrap(sizebuff).getInt();
         byte[] objectbuff = new byte[size];
         input.read(objectbuff);
-        try (
-            var byteStream = new ByteArrayInputStream(objectbuff);
-            var objectStream = new ObjectInputStream(byteStream);
-        ) {
-            return objectStream.readObject();
+        try (var byteStream = new ByteArrayInputStream(objectbuff);) {
+            try (var objectStream = new ObjectInputStream(byteStream);) {
+                return objectStream.readObject();
+            } catch (EOFException err) {
+                return null;
+            }
+        } catch (EOFException err) {
+            return null;
         }
     }
 

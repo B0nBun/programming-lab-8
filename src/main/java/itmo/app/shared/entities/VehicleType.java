@@ -2,6 +2,8 @@ package itmo.app.shared.entities;
 
 import itmo.app.client.LocaleService;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -39,13 +41,21 @@ public enum VehicleType {
 
     public static class Combo extends JComboBox<VehicleType> {
 
-        public Combo() {
-            super(VehicleType.values());
+        public Combo(boolean allowEmpty) {
+            super(allowEmpty ? valuesWithNull() : VehicleType.values());
             this.setRenderer(new VehicleTypeRenderer());
 
             LocaleService.onLocaleChange((locale, rb) -> {
                 this.repaint();
             });
+        }
+
+        private static VehicleType[] valuesWithNull() {
+            var values = new ArrayList<>(Arrays.asList(VehicleType.values()));
+            values.add(0, null);
+            VehicleType[] array = new VehicleType[values.size()];
+            values.toArray(array);
+            return array;
         }
     }
 }
@@ -62,9 +72,7 @@ class VehicleTypeRenderer extends BasicComboBoxRenderer {
     ) {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-        VehicleType type = (VehicleType) value;
-        this.setText(LocaleService.translate(type.toString()));
-        // this.setText(type.toString());
+        this.setText(value == null ? "" : LocaleService.translate(value.toString()));
 
         return this;
     }

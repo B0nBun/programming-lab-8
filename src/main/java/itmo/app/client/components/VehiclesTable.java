@@ -28,47 +28,47 @@ public class VehiclesTable extends JTable {
         String fuelType = null;
 
         public Filters withId(String id) {
-            this.id = id;
+            this.id = id.length() == 0 ? null : id;
             return this;
         }
 
         public Filters withName(String name) {
-            this.name = name;
+            this.name = name.length() == 0 ? null : name;
             return this;
         }
 
         public Filters withCreatedBy(String createdBy) {
-            this.createdBy = createdBy;
+            this.createdBy = createdBy.length() == 0 ? null : createdBy;
             return this;
         }
 
         public Filters withCoordinatesX(String coordinatesX) {
-            this.coordinatesX = coordinatesX;
+            this.coordinatesX = coordinatesX.length() == 0 ? null : coordinatesX;
             return this;
         }
 
         public Filters withCoordinatesY(String coordinatesY) {
-            this.coordinatesY = coordinatesY;
+            this.coordinatesY = coordinatesY.length() == 0 ? null : coordinatesY;
             return this;
         }
 
         public Filters withCreationDate(String creationDate) {
-            this.creationDate = creationDate;
+            this.creationDate = creationDate.length() == 0 ? null : creationDate;
             return this;
         }
 
         public Filters withEnginePower(String enginePower) {
-            this.enginePower = enginePower;
+            this.enginePower = enginePower.length() == 0 ? null : enginePower;
             return this;
         }
 
-        public Filters withvehicleType(String vehicleType) {
-            this.vehicleType = vehicleType;
+        public Filters withVehicleType(String vehicleType) {
+            this.vehicleType = vehicleType.length() == 0 ? null : vehicleType;
             return this;
         }
 
         public Filters withFuelType(String fuelType) {
-            this.fuelType = fuelType;
+            this.fuelType = fuelType.length() == 0 ? null : fuelType;
             return this;
         }
     }
@@ -187,26 +187,41 @@ class VehiclesTableModel extends AbstractTableModel {
     ) {
         Stream<String[]> stream = vehicles
             .stream()
-            .filter(vehicle ->
-                filters.id == null ||
-                filters.id.equals(vehicle.id().toString()) ||
-                filters.name == null ||
-                filters.name.equals(vehicle.name()) ||
-                filters.createdBy == null ||
-                filters.createdBy.equals(vehicle.createdBy().toString()) ||
-                filters.coordinatesX == null ||
-                filters.coordinatesX.equals(vehicle.coordinates().x().toString()) ||
-                filters.coordinatesY == null ||
-                filters.coordinatesY.equals(vehicle.coordinates().y().toString()) ||
-                filters.creationDate == null ||
-                filters.creationDate.equals(vehicle.creationDate().toString()) ||
-                filters.enginePower == null ||
-                filters.enginePower.equals(vehicle.enginePower().toString()) ||
-                filters.vehicleType == null ||
-                filters.vehicleType.equals(vehicle.type().toString()) ||
-                filters.fuelType == null ||
-                filters.fuelType.equals(vehicle.fuelType().toString())
-            )
+            .filter(vehicle -> {
+                System.out.println(filters.vehicleType + " " + vehicle.type().toString());
+                return (
+                    (filters.id == null || filters.id.equals(vehicle.id().toString())) &&
+                    (filters.name == null || filters.name.equals(vehicle.name())) &&
+                    (
+                        filters.createdBy == null ||
+                        filters.createdBy.equals(vehicle.createdBy().toString())
+                    ) &&
+                    (
+                        filters.coordinatesX == null ||
+                        filters.coordinatesX.equals(vehicle.coordinates().x().toString())
+                    ) &&
+                    (
+                        filters.coordinatesY == null ||
+                        filters.coordinatesY.equals(vehicle.coordinates().y().toString())
+                    ) &&
+                    (
+                        filters.creationDate == null ||
+                        filters.creationDate.equals(vehicle.creationDate().toString())
+                    ) &&
+                    (
+                        filters.enginePower == null ||
+                        filters.enginePower.equals(vehicle.enginePower().toString())
+                    ) &&
+                    (
+                        filters.vehicleType == null ||
+                        filters.vehicleType.equals(vehicle.type().toString())
+                    ) &&
+                    (
+                        filters.fuelType == null ||
+                        filters.fuelType.equals(vehicle.fuelType().toString())
+                    )
+                );
+            })
             .map(vehicle ->
                 new String[] {
                     vehicle.id().toString(),

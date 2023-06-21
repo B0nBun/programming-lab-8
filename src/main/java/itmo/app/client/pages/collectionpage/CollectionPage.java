@@ -31,7 +31,6 @@ import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
@@ -123,7 +122,7 @@ public class CollectionPage extends JPanel implements Page {
 
         public final GridBagConstraints constraints = new GridBagConstraints();
 
-        public SidePanel(JTable table, String login, String password) {
+        public SidePanel(VehiclesTable table, String login, String password) {
             super();
             this.constraints.fill = GridBagConstraints.HORIZONTAL;
             this.constraints.anchor = GridBagConstraints.PAGE_START;
@@ -420,25 +419,59 @@ public class CollectionPage extends JPanel implements Page {
 
             this.add(createLabel.apply("id"), new InnerConstraints());
             var idFilter = new JTextField();
+            this.add(idFilter, new InnerConstraints());
+
             this.add(createLabel.apply("name"), new InnerConstraints());
             var nameFilter = new JTextField();
+            this.add(nameFilter, new InnerConstraints());
+
             this.add(createLabel.apply("created_by"), new InnerConstraints());
             var createdByFilter = new JTextField();
+            this.add(createdByFilter, new InnerConstraints());
+
             this.add(createLabel.apply("coordinates.x"), new InnerConstraints());
             var coordsXFilter = new JTextField();
+            this.add(coordsXFilter, new InnerConstraints());
+
             this.add(createLabel.apply("coordinates.y"), new InnerConstraints());
             var coordsYFilter = new JTextField();
+            this.add(coordsYFilter, new InnerConstraints());
+
             this.add(createLabel.apply("creation_date"), new InnerConstraints());
             var creationDateFilter = new JTextField();
+            this.add(creationDateFilter, new InnerConstraints());
+
             this.add(createLabel.apply("engine_power"), new InnerConstraints());
             var enginePowerFilter = new JTextField();
+            this.add(enginePowerFilter, new InnerConstraints());
+
             this.add(createLabel.apply("vehicle_type"), new InnerConstraints());
-            var vehicleTypeFilter = new FuelType.Combo();
+            var vehicleTypeFilter = new VehicleType.Combo(true);
+            this.add(vehicleTypeFilter, new InnerConstraints());
+
             this.add(createLabel.apply("fuel_type"), new InnerConstraints());
-            var fuelTypeFilter = new VehicleType.Combo();
+            var fuelTypeFilter = new FuelType.Combo(true);
+            this.add(fuelTypeFilter, new InnerConstraints());
 
             var filterButton = new TranslatedButton("apply_filters");
-            filterButton.addActionListener(_action -> {});
+            filterButton.addActionListener(_action -> {
+                Object vtFilter = vehicleTypeFilter.getSelectedItem();
+                Object ftFilter = fuelTypeFilter.getSelectedItem();
+                table.updateFilters(
+                    new VehiclesTable.Filters()
+                        .withId(idFilter.getText())
+                        .withName(nameFilter.getText())
+                        .withCreatedBy(createdByFilter.getText())
+                        .withCoordinatesX(coordsXFilter.getText())
+                        .withCoordinatesY(coordsYFilter.getText())
+                        .withCreationDate(creationDateFilter.getText())
+                        .withEnginePower(enginePowerFilter.getText())
+                        .withVehicleType(vtFilter == null ? "" : vtFilter.toString())
+                        .withFuelType(ftFilter == null ? "" : ftFilter.toString())
+                );
+            });
+
+            this.add(Box.createRigidArea(new Dimension(0, 10)), new InnerConstraints());
             this.add(filterButton, new InnerConstraints());
         }
     }

@@ -2,6 +2,8 @@ package itmo.app.shared.entities;
 
 import itmo.app.client.LocaleService;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -41,13 +43,21 @@ public enum FuelType {
 
     public static class Combo extends JComboBox<FuelType> {
 
-        public Combo() {
-            super(FuelType.values());
+        public Combo(boolean allowEmpty) {
+            super(allowEmpty ? valuesWithNull() : FuelType.values());
             this.setRenderer(new FuelTypeRenderer());
 
             LocaleService.onLocaleChange((locale, rb) -> {
                 this.repaint();
             });
+        }
+
+        private static FuelType[] valuesWithNull() {
+            var values = new ArrayList<>(Arrays.asList(FuelType.values()));
+            values.add(0, null);
+            FuelType[] array = new FuelType[values.size()];
+            values.toArray(array);
+            return array;
         }
     }
 }
@@ -64,8 +74,7 @@ class FuelTypeRenderer extends BasicComboBoxRenderer {
     ) {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-        FuelType type = (FuelType) value;
-        this.setText(LocaleService.translate(type.toString()));
+        this.setText(value == null ? "" : LocaleService.translate(value.toString()));
 
         return this;
     }

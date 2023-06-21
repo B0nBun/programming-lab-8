@@ -4,20 +4,25 @@ import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
 import itmo.app.client.components.VehiclesTable;
 import itmo.app.client.pages.Page;
-import itmo.app.client.pages.collectionpage.components.AddPanel;
+import itmo.app.client.pages.collectionpage.components.AddOrEditPanel;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
+import itmo.app.shared.clientrequest.requestbody.UpdateRequestBody;
 import itmo.app.shared.entities.Vehicle;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.function.Consumer;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 public class CollectionPage extends JPanel implements Page {
@@ -47,7 +52,7 @@ public class CollectionPage extends JPanel implements Page {
             this.add(scrollPane, scrollPane.constraints);
         }
         {
-            var sidepanel = new SidePanel(login, password);
+            var sidepanel = new SidePanel(table, login, password);
             this.add(sidepanel, sidepanel.constraints);
         }
     }
@@ -74,6 +79,23 @@ public class CollectionPage extends JPanel implements Page {
             this.constraints.gridy = 0;
             this.constraints.gridheight = 1;
             this.constraints.gridwidth = 1;
+
+            this.addMouseListener(
+                    new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent event) {
+                            table.clearSelection();
+                        }
+
+                        public void mouseEntered(MouseEvent arg0) {}
+
+                        public void mouseExited(MouseEvent arg0) {}
+
+                        public void mousePressed(MouseEvent arg0) {}
+
+                        public void mouseReleased(MouseEvent arg0) {}
+                    }
+                );
         }
     }
 
@@ -99,7 +121,7 @@ public class CollectionPage extends JPanel implements Page {
 
         public final GridBagConstraints constraints = new GridBagConstraints();
 
-        public SidePanel(String login, String password) {
+        public SidePanel(JTable table, String login, String password) {
             super();
             this.constraints.fill = GridBagConstraints.HORIZONTAL;
             this.constraints.anchor = GridBagConstraints.PAGE_START;
@@ -120,9 +142,10 @@ public class CollectionPage extends JPanel implements Page {
              * ? group-counting-by-id
              */
             {
+                // TODO: Translate dialog title
                 var addButton = new TranslatedButton("add");
                 addButton.addActionListener(_action -> {
-                    var dialog = new JDialog(Client.frame, "Title", true);
+                    var dialog = new JDialog(Client.frame, "Add", true);
                     Consumer<Vehicle.CreationSchema> listener = creationSchema -> {
                         Client.messenger.sendAndThen(
                             new ClientRequest<>(
@@ -149,7 +172,15 @@ public class CollectionPage extends JPanel implements Page {
                     };
                     dialog
                         .getContentPane()
-                        .add(new AddPanel(dialog, login, password, listener));
+                        .add(
+                            new AddOrEditPanel(
+                                dialog,
+                                login,
+                                password,
+                                listener,
+                                Optional.empty()
+                            )
+                        );
                     dialog.pack();
                     dialog.setVisible(true);
                 });
@@ -164,8 +195,73 @@ public class CollectionPage extends JPanel implements Page {
             }
             {
                 var updateButton = new TranslatedButton("update");
+                updateButton.setEnabled(false);
+                table
+                    .getSelectionModel()
+                    .addListSelectionListener(selectionEvent -> {
+                        int row = table.getSelectedRow();
+                        if (row == -1) {
+                            updateButton.setEnabled(false);
+                        } else {
+                            Vehicle selected = Vehicle.fromTable(table, row);
+                            if (selected.createdBy().equals(login)) {
+                                updateButton.setEnabled(true);
+                            } else {
+                                updateButton.setEnabled(false);
+                            }
+                        }
+                    });
+
                 updateButton.addActionListener(_action -> {
-                    System.out.println("update");
+                    var dialog = new JDialog(Client.frame, "Update", true);
+                    Vehicle selectedVehicle = Vehicle.fromTable(
+                        table,
+                        table.getSelectedRow()
+                    );
+                    Consumer<Vehicle.CreationSchema> listener = creationSchema -> {
+                        Client.messenger.sendAndThen(
+                            new ClientRequest<>(
+                                login,
+                                password,
+                                new UpdateRequestBody(
+                                    Vehicle.fromCreationSchema(
+                                        selectedVehicle.id(),
+                                        selectedVehicle.createdBy(),
+                                        selectedVehicle.creationDate(),
+                                        creationSchema
+                                    )
+                                )
+                            ),
+                            response -> {
+                                if (response.body.errorMessage() != null) {
+                                    Client.showErrorNotification(
+                                        "error: " + response.body.errorMessage()
+                                    );
+                                } else {
+                                    Client.showSuccessNotification("success");
+                                    dialog.dispose();
+                                }
+                            },
+                            error -> {
+                                Client.showErrorNotification(
+                                    "error: " + error.getMessage()
+                                );
+                            }
+                        );
+                    };
+                    dialog
+                        .getContentPane()
+                        .add(
+                            new AddOrEditPanel(
+                                dialog,
+                                login,
+                                password,
+                                listener,
+                                Optional.of(selectedVehicle)
+                            )
+                        );
+                    dialog.pack();
+                    dialog.setVisible(true);
                 });
                 this.add(updateButton, new ButtonConstraints());
             }

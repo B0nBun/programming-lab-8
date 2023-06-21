@@ -151,7 +151,8 @@ public class DataSource {
                 stat.setString(2, creationSchema.name());
                 int removed = stat.executeUpdate();
                 DataSource.Vehicles.collection.removeIf(v ->
-                    v.createdBy().equals(login) && v.name().compareTo(creationSchema.name()) < 0
+                    v.createdBy().equals(login) &&
+                    v.name().compareTo(creationSchema.name()) < 0
                 );
                 return removed;
             }

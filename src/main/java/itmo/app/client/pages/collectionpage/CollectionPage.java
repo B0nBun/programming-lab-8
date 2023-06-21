@@ -26,7 +26,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 public class CollectionPage extends JPanel implements Page {
 
@@ -66,15 +65,6 @@ public class CollectionPage extends JPanel implements Page {
 
         public VehiclesScrollPane(VehiclesTable table) {
             super(table);
-            table.setModel(
-                new DefaultTableModel() {
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                        return false;
-                    }
-                }
-            );
-
             this.constraints.fill = GridBagConstraints.BOTH;
             this.constraints.weightx = 1;
             this.constraints.weighty = 1;

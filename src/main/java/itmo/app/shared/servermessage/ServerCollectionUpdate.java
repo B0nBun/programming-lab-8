@@ -1,13 +1,13 @@
 package itmo.app.shared.servermessage;
 
 import itmo.app.shared.entities.Vehicle;
-import java.util.Collection;
+import java.util.List;
 
 public class ServerCollectionUpdate implements ServerMessage {
 
-    public final Collection<Vehicle> newCollection;
+    public final List<Vehicle> newCollection;
 
-    public ServerCollectionUpdate(Collection<Vehicle> newCollection) {
+    public ServerCollectionUpdate(List<Vehicle> newCollection) {
         this.newCollection = newCollection;
     }
 }

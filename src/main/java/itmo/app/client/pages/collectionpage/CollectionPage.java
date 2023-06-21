@@ -4,7 +4,7 @@ import itmo.app.client.Client;
 import itmo.app.client.components.TranslatedButton;
 import itmo.app.client.components.VehiclesTable;
 import itmo.app.client.pages.Page;
-import itmo.app.client.pages.collectionpage.components.AddOrEditPanel;
+import itmo.app.client.pages.collectionpage.components.CreationSchemaPanel;
 import itmo.app.shared.clientrequest.ClientRequest;
 import itmo.app.shared.clientrequest.requestbody.AddIfMaxRequestBody;
 import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
@@ -137,7 +137,6 @@ public class CollectionPage extends JPanel implements Page {
              * Commands:
              * remove
              * remove-lower
-             * clear
              * ? group-counting-by-id
              */
             {
@@ -172,7 +171,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog
                         .getContentPane()
                         .add(
-                            new AddOrEditPanel(
+                            new CreationSchemaPanel(
                                 dialog,
                                 login,
                                 password,
@@ -216,7 +215,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog
                         .getContentPane()
                         .add(
-                            new AddOrEditPanel(
+                            new CreationSchemaPanel(
                                 dialog,
                                 login,
                                 password,
@@ -288,7 +287,7 @@ public class CollectionPage extends JPanel implements Page {
                     dialog
                         .getContentPane()
                         .add(
-                            new AddOrEditPanel(
+                            new CreationSchemaPanel(
                                 dialog,
                                 login,
                                 password,

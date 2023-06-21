@@ -20,9 +20,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class AddOrEditPanel extends JPanel {
+public class CreationSchemaPanel extends JPanel {
 
-    public AddOrEditPanel(
+    public CreationSchemaPanel(
         JDialog dialog,
         String login,
         String password,

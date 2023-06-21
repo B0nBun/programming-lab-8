@@ -6,6 +6,7 @@ import itmo.app.client.components.VehiclesTable;
 import itmo.app.client.pages.Page;
 import itmo.app.client.pages.collectionpage.components.AddOrEditPanel;
 import itmo.app.shared.clientrequest.ClientRequest;
+import itmo.app.shared.clientrequest.requestbody.AddIfMaxRequestBody;
 import itmo.app.shared.clientrequest.requestbody.AddRequestBody;
 import itmo.app.shared.clientrequest.requestbody.ClearRequestBody;
 import itmo.app.shared.clientrequest.requestbody.GetRequestBody;
@@ -133,9 +134,7 @@ public class CollectionPage extends JPanel implements Page {
             this.constraints.gridwidth = 1;
             this.setLayout(new GridBagLayout());
             /**
-             * add
-             * add-if-max
-             * update
+             * Commands:
              * remove
              * remove-lower
              * clear
@@ -189,7 +188,44 @@ public class CollectionPage extends JPanel implements Page {
             {
                 var addIfMaxButton = new TranslatedButton("add_if_max");
                 addIfMaxButton.addActionListener(_action -> {
-                    System.out.println("add-if-max");
+                    var dialog = new JDialog(Client.frame, "Add", true);
+                    Consumer<Vehicle.CreationSchema> listener = creationSchema -> {
+                        Client.messenger.sendAndThen(
+                            new ClientRequest<>(
+                                login,
+                                password,
+                                new AddIfMaxRequestBody(creationSchema)
+                            ),
+                            response -> {
+                                if (response.body.errorMessage() != null) {
+                                    Client.showErrorNotification(
+                                        "error: " + response.body.errorMessage()
+                                    );
+                                } else {
+                                    Client.showSuccessNotification("success");
+                                    dialog.dispose();
+                                }
+                            },
+                            error -> {
+                                Client.showErrorNotification(
+                                    "error: " + error.getMessage()
+                                );
+                            }
+                        );
+                    };
+                    dialog
+                        .getContentPane()
+                        .add(
+                            new AddOrEditPanel(
+                                dialog,
+                                login,
+                                password,
+                                listener,
+                                Optional.empty()
+                            )
+                        );
+                    dialog.pack();
+                    dialog.setVisible(true);
                 });
                 this.add(addIfMaxButton, new ButtonConstraints());
             }
